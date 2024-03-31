@@ -1,0 +1,23 @@
+form{
+    width: 80%;
+    height: auto;
+    background-color: antiquewhite;
+    margin:0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content:left;
+}
+.input{
+    display: flex;
+    justify-content: space-between;
+    width: 60%;
+    height: 30px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+
+}
+.input select, .myFiles{
+    width: 80%;
+    height: 100%;
+}
