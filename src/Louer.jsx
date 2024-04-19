@@ -6,12 +6,16 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 // import LouerModeleHero from "./Components/LouerModeleHero";
 export default function Louer() {
-    const [typeMaison, setTypeMaison] = useState("Type d'habitation");
+    //const [typeMaison, setTypeMaison] = useState("Type d'habitation");
     const [maisons, setMaisons] = useState([]);
     const [loader, setLoader] = useState(true);
+     const [cuisine,setCuisine]=useState(false);
+
     var minPrix = 0;
     var maxPrix = 1000000;
-    var prixMaison = 0
+    var prixMaison = 0;
+    var indexQuartier=0;
+    var typeMaison='';
 
     var quartierMaison = ''
     const quartiers = [
@@ -29,7 +33,7 @@ export default function Louer() {
         },
         {
             id_quartier: '4',
-            nom_quartier: ''
+            nom_quartier: 'Sebenicoro'
         },
         {
             id_quartier: '5',
@@ -89,7 +93,7 @@ export default function Louer() {
 
     const [filters, setFilters] = useState({
         typeMaison: '',
-        quartierField: '',
+        quartierFieldValue: '',
         tranchePrix: '',
         position: '',
         composition: '',
@@ -113,7 +117,18 @@ export default function Louer() {
     }
     const filteredData = maisons.filter((item) => {
         prixMaison = parseInt(item.prix);
-        const { typeMaisone, quartierField, tranchePrix, position, composition, magasin, cuisine } = filters;
+        const {quartierFieldValue, tranchePrix, position, composition, magasin} = filters;
+        typeMaison=filters.typeMaison;
+
+        //Trouver l'index du quartier dans le champ de recherche
+        quartiers.map(quartier=>{
+            if(quartier.nom_quartier==quartierFieldValue)
+            {
+                indexQuartier=quartier.id_quartier
+            }
+        });
+       // console.log(indexQuartier);
+
         switch (tranchePrix) {
             case 'tranche0':
                 maxPrix = 25000;
@@ -142,6 +157,8 @@ export default function Louer() {
             default:
                 <p>Tranche de prix incorrect ! </p>
         }
+        
+    //console.log(item.position);
         return (
             //item.typeMaisone.toLowerCase().includes(typeMaisone.toLowerCase()) &&
             //item.tranchePrix.toString().includes(tranchePrix) &&
@@ -150,11 +167,14 @@ export default function Louer() {
             prixMaison >= minPrix &&
             prixMaison <= maxPrix &&
             item.position == position &&
-            item.quartier == quartierField
+            item.quartier == indexQuartier
 
         );
 
     });
+    console.log(cuisine);
+
+   // console.log(typeMaison);
     console.log(filteredData);
 
     let navigate = useNavigate();
@@ -177,11 +197,11 @@ export default function Louer() {
                         </select>
                     </div>
                     <div className="element quartier">
-                        <input type="text" placeholder="Quartier" list="quartiers" name="quartierField" value={filters.quartierField} onChange={handleChange} />
+                        <input type="text" placeholder="Quartier" list="quartiers" name="quartierFieldValue" value={filters.quartierFieldValue} onChange={handleChange} />
                         <datalist id="quartiers">
                             {
                                 quartiers.map(quartier => (
-                                    <option value={quartier.id_quartier}>{quartier.nom_quartier}</option>
+                                    <option value={quartier.nom_quartierquartier}>{quartier.nom_quartier}</option>
                                 ))
                             }
 
@@ -221,7 +241,7 @@ export default function Louer() {
                         <input type="checkbox" name="magasin" value={filters.magasin} id="" onChange={handleChange} /><span>Avec magasin</span>
                     </div>
                     <div className={typeMaison == "maison" || "" ? "cuisine" : "pas_affichage"}>
-                        <input type="checkbox" name="cuisine" value={filters.cuisine} id="" onChange={handleChange} /><span>Avec cuisine</span>
+                        <input type="checkbox" name="cuisine" value={filters.cuisine} id="" onChange={handleChange} onClick={()=>setCuisine(!cuisine)}/><span>Avec cuisine</span>
                     </div>
                 </div>
                 <button>Rechercher</button>
