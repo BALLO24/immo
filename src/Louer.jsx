@@ -9,93 +9,167 @@ export default function Louer() {
     const [typeMaison, setTypeMaison] = useState("Type d'habitation");
     const [maisons, setMaisons] = useState([]);
     const [loader, setLoader] = useState(true);
-    useEffect(()=>{
+    var minPrix = 0;
+    var maxPrix = 1000000;
+    var prixMaison = 0
 
-        fetch('http://localhost:5000/louer')
-        .then(res=>res.json())
-        .then(data=>{setMaisons(data);
-            console.log(data);
-                    setLoader(false)})
-        .catch(err=>console.log(err))
-    }, [])
-
-    const quartiers=[
+    var quartierMaison = ''
+    const quartiers = [
         {
-            id_quartier:'1',
-            nom_quartier:'Niamakoro'
+            id_quartier: '1',
+            nom_quartier: 'Niamakoro'
         },
         {
-            id_quartier:'2',
-            nom_quartier:'Kalaban Coura'
+            id_quartier: '2',
+            nom_quartier: 'Kalaban Coura'
         },
         {
-            id_quartier:'3',
-            nom_quartier:'Niamana'
+            id_quartier: '3',
+            nom_quartier: 'Niamana'
         },
         {
-            id_quartier:'4',
-            nom_quartier:''
+            id_quartier: '4',
+            nom_quartier: ''
         },
         {
-            id_quartier:'5',
-            nom_quartier:'Baco Djicoroni'
+            id_quartier: '5',
+            nom_quartier: 'Baco Djicoroni'
         },
         {
-            id_quartier:'6',
-            nom_quartier:'Siracoro'
+            id_quartier: '6',
+            nom_quartier: 'Siracoro'
         },
         {
-            id_quartier:'7',
-            nom_quartier:'Senou'
+            id_quartier: '7',
+            nom_quartier: 'Senou'
         },
         {
-            id_quartier:'8',
-            nom_quartier:'Lafiabougou'
+            id_quartier: '8',
+            nom_quartier: 'Lafiabougou'
         },
     ];
-
-    const composition=[
+    const composition = [
         {
-            id_composition:'0',
-            nom_composition:''
+            id_composition: '0',
+            nom_composition: ''
         },
         {
-            id_composition:'1',
-            nom_composition:'Rez-de-chausée'
+            id_composition: '1',
+            nom_composition: 'Rez-de-chausée'
         },
         {
-            id_composition:'2',
-            nom_composition:'Premier étage'
+            id_composition: '2',
+            nom_composition: 'Premier étage'
         },
         {
-            id_composition:'3',
-            nom_composition:'Deuxième étage'
+            id_composition: '3',
+            nom_composition: 'Deuxième étage'
         },
 
     ]
+    const copyQuartier = quartiers.slice();
+    const [dataQuartier, setDataQuartier] = useState(quartiers);
+    // console.log(dataQuartier);
+
+
+
+    useEffect(() => {
+
+        fetch('http://localhost:5000/louer')
+            .then(res => res.json())
+            .then(data => {
+                setMaisons(data);
+                setLoader(false);
+            })
+            .catch(err => console.log(err))
+    }, [])
+
+
+
+
+    const [filters, setFilters] = useState({
+        typeMaison: '',
+        quartierField: '',
+        tranchePrix: '',
+        position: '',
+        composition: '',
+        magasin: '',
+        cuisine: ''
+    });
+
 
     const handleChange = (e) => {
-        setTypeMaison(e.target.value);
-        console.log(e.target.value);
-    }
-    let navigate=useNavigate();
+        // setTypeMaison(e.target.value);
+        // console.log(e.target.value);
 
-    const userId=(id)=>{
-        navigate("/choix_loyer/"+id)
+
+        const { name, value } = e.target;
+        setFilters({
+            ...filters,
+            [name]: value,
+        });
+        //console.log(filters);
+
     }
-    const [fieldQuartier,setFieldQuartier]=useState("");
-    const onChange=(e)=>{
-        setFieldQuartier(e.target.value);
+    const filteredData = maisons.filter((item) => {
+        prixMaison = parseInt(item.prix);
+        const { typeMaisone, quartierField, tranchePrix, position, composition, magasin, cuisine } = filters;
+        switch (tranchePrix) {
+            case 'tranche0':
+                maxPrix = 25000;
+                break;
+            case 'tranche1':
+                minPrix = 25000;
+                maxPrix = 50000;
+                break;
+            case 'tranche2':
+                minPrix = 50000;
+                maxPrix = 75000;
+                break;
+            case 'tranche3':
+                minPrix = 75000;
+                maxPrix = 100000;
+                break;
+            case 'tranche4':
+                minPrix = 100000;
+                maxPrix = 150000;
+                break;
+
+            case 'tranche5':
+                minPrix = 150000;
+                maxPrix = 10000000;
+                break;
+            default:
+                <p>Tranche de prix incorrect ! </p>
+        }
+        return (
+            //item.typeMaisone.toLowerCase().includes(typeMaisone.toLowerCase()) &&
+            //item.tranchePrix.toString().includes(tranchePrix) &&
+            //item.position.toLowerCase().includes(position.toLowerCase())
+            //item.composition==composition &&
+            prixMaison >= minPrix &&
+            prixMaison <= maxPrix &&
+            item.position == position &&
+            item.quartier == quartierField
+
+        );
+
+    });
+    console.log(filteredData);
+
+    let navigate = useNavigate();
+
+    const userId = (id) => {
+        navigate("/choix_loyer/" + id)
     }
 
     return (
         <div className="Louer" louerImagesHero={LouerImagesHero}>
-            {/* {loader && <img src={maisons[0].photo2} alt="" />} */}
             <p className="title">Rechercher une annonce sur MALI-IMMO...</p>
             <form action="">
                 <div className="criteres">
                     <div className="element typeMaison">
-                        <select value={typeMaison} onChange={handleChange}>
+                        <select name="typeMaison" value={filters.typeMaison} onChange={handleChange}>
                             <option value="">Type d'habitation</option>
                             <option value="maison">Maison</option>
                             <option value="appartement">Appartement</option>
@@ -103,29 +177,19 @@ export default function Louer() {
                         </select>
                     </div>
                     <div className="element quartier">
-                        <input type="text" placeholder="Quartier" value={fieldQuartier}  onChange={onChange}/>
-                        <div className="search_results">
-                            <div>A</div>
-                            <div>B</div>
-                            <div>A</div>
-                            <div>B</div>
-                            <div>A</div>
-                            <div>B</div>
-                            <div>A</div>
-                            <div>B</div>
-                            <div>A</div>
-                            <div>B</div>
-                            <div>A</div>
-                            <div>B</div>
-                            <div>A</div>
-                            <div>B</div>
+                        <input type="text" placeholder="Quartier" list="quartiers" name="quartierField" value={filters.quartierField} onChange={handleChange} />
+                        <datalist id="quartiers">
+                            {
+                                quartiers.map(quartier => (
+                                    <option value={quartier.id_quartier}>{quartier.nom_quartier}</option>
+                                ))
+                            }
 
-                        </div>
-                        
-                     </div>
+                        </datalist>
+                    </div>
 
                     <div className="element position">
-                        <select >
+                        <select name="tranchePrix" value={filters.tranchePrix} onChange={handleChange}>
                             <option value="">Tranches de prix en FCFA</option>
                             <option value="tranche0">dessous de 25 000 FCFA</option>
                             <option value="tranche1">25 000 FCFA - 50 000 FCFA</option>
@@ -136,17 +200,17 @@ export default function Louer() {
                         </select>
                     </div>
                     <div className="element position">
-                        <select >
+                        <select name="position" value={filters.position} onChange={handleChange}>
                             <option value="">Position</option>
-                            <option value="position0">Rez-de-chaussé</option>
-                            <option value="position1">Premier étage</option>
-                            <option value="position2">Deuxième étage</option>
+                            <option value="1">Rez-de-chaussé</option>
+                            <option value="2">Premier étage</option>
+                            <option value="3">Deuxième étage</option>
                         </select>
                     </div>
                     <div className={typeMaison == "maison" || "" ? "element composition" : "pas_affichage"}>
-                        <select >
+                        <select name="composition" value={filters.composition} onChange={handleChange}>
                             <option value="" >Composition</option>
-                            <option value="composition0">chambre unique</option>
+                            <option value="1">chambre unique</option>
                             <option value="composition1">1 chambre salon</option>
                             <option value="composition2">2 chambres salon</option>
                         </select>
@@ -154,43 +218,44 @@ export default function Louer() {
                 </div>
                 <div className=" checkbox">
                     <div className={typeMaison == "maison" || "" ? "magasin" : "pas_affichage"}>
-                        <input type="checkbox" name="" id="" /><span>Avec magasin</span>
+                        <input type="checkbox" name="magasin" value={filters.magasin} id="" onChange={handleChange} /><span>Avec magasin</span>
                     </div>
                     <div className={typeMaison == "maison" || "" ? "cuisine" : "pas_affichage"}>
-                        <input type="checkbox" name="" id="" /><span>Avec cuisine</span>
+                        <input type="checkbox" name="cuisine" value={filters.cuisine} id="" onChange={handleChange} /><span>Avec cuisine</span>
                     </div>
                 </div>
                 <button>Rechercher</button>
             </form>
             {!loader && <div className="resultats">
-            { 
-                maisons.map(maison =>{
-                quartiers.map(quartier=>{
-                    if(quartier.id_quartier==maison.quartier){
-                         maison.quartier=quartier.nom_quartier
-                    }
-                    composition.map(composition =>{
-                        if(composition.id_composition==maison.composition){
-                            maison.composition=composition.nom_composition
-                        }
-                    })
-                })
-                return(
-                    <div className="card">
-                    <div className="content-img">
-                        <img src={maison.photo1} alt="" />
-                    </div>
-                    <p><span>{maison.composition}</span></p>
-                    <p><span>{maison.quartier}</span></p>
-                    <p><span>{maison.prix} FCFA</span></p>
-                    <div className="btn-info">
-                        <button onClick={()=>userId(maison.id)}>Plus d'info</button>
-                    </div>
-                </div>
-                )
-            }) }
+                {
+                    maisons.map(maison => {
+                        quartiers.map(quartier => {
+                            if (quartier.id_quartier == maison.quartier) {
+                                // maison.quartier = quartier.nom_quartier
+                                quartierMaison = quartier.nom_quartier
+                            }
+                            composition.map(composition => {
+                                if (composition.id_composition == maison.composition) {
+                                    maison.composition = composition.nom_composition
+                                }
+                            })
+                        })
+                        return (
+                            <div className="card">
+                                <div className="content-img">
+                                    <img src={maison.photo1} alt="" />
+                                </div>
+                                <p><span>{maison.composition}</span></p>
+                                <p><span>{quartierMaison}</span></p>
+                                <p><span>{maison.prix} FCFA</span></p>
+                                <div className="btn-info">
+                                    <button onClick={() => userId(maison.id)}>Plus d'info</button>
+                                </div>
+                            </div>
+                        )
+                    })}
 
-                
+
                 <div className="card">
                     <div className="content-img">
                         <img src="../../img/maisons/mini1.jpg" alt="mini villa 1" />

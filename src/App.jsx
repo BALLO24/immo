@@ -7,7 +7,9 @@ import Louer from './Louer';
 import Contact from './Contact';
 import ChoixLoyer from './ChoixLoyer';
 import AjoutMaison from './AjoutMaison';
+import SupprimerMaison from './SupprimerMaison';
 import Footer from './Footer';
+import Admin from './Admin';
 function App() {
   return (
     <>
@@ -20,6 +22,8 @@ function App() {
               <Route path="/contact" exact element={<Contact/>} />
               <Route path="/choix_loyer/:uid" exact element={<ChoixLoyer/>} />
               <Route path="/ajout_maison" exact element={<AjoutMaison/>} />
+              <Route path="/supprimer_maison" exact element={<SupprimerMaison/>} />
+              <Route path="/admin" exact element={<Admin/>} />
           </Routes>
           <Footer/>
       </Router>

@@ -3,6 +3,7 @@ import cors from 'cors';
 import mysql from 'mysql';
 import multer from 'multer';
 import path from 'path';
+import fs from 'fs'
 const app = express();
 app.use(express.json())
 app.use(cors())
@@ -16,6 +17,24 @@ app.use((req, res, next) => {
     );
     next();
 })
+
+
+
+//fonction pour supprimer une image
+
+function supprimerImage(cheminImage) {
+  fs.unlink(cheminImage, (err) => {
+    if (err) {
+      if (err.code === 'ENOENT') {
+        console.error('Image introuvable :', cheminImage);
+      } else {
+        console.error('Erreur lors de la suppression de l\'image :', err);
+      }
+    } else {
+      console.log('Image supprimée avec succès :', cheminImage);
+    }
+  });
+}
 
 
 const port = 5000;
@@ -62,6 +81,37 @@ app.post('/choix_loyer',(req,res)=>{
         }
     })
 })
+
+
+app.post('/supprimer_maison',(req,res)=>{
+    // let uid=req.params.uid
+    const {id}=req.body
+    console.log(id);
+    const sql=`SELECT * FROM maison WHERE id=${id}`;
+    mysqlConnexion.query(sql,(err,data)=>{
+        if(err){
+            res.status(500).send(err);
+        }
+        else{
+            // res.status(200).json(data);
+            // console.log(data[0].photo1);
+            supprimerImage(data[0].photo1)
+            supprimerImage(data[0].photo2)
+            //supprimerImage(data[0].photo3)
+            const sqlDel=`DELETE FROM maison WHERE id=${id}`;
+            mysqlConnexion.query(sqlDel,(errDel,dataRes)=>{
+                if(errDel){
+                    res.status(500).send(errDel)
+                }
+                else{
+                    res.status(200).send('success');
+                }
+            })
+
+        }
+    })
+})
+
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
