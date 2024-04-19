@@ -119,6 +119,7 @@ export default function Louer() {
         prixMaison = parseInt(item.prix);
         const {quartierFieldValue, tranchePrix, position, composition, magasin} = filters;
         typeMaison=filters.typeMaison;
+        
 
         //Trouver l'index du quartier dans le champ de recherche
         quartiers.map(quartier=>{
@@ -158,7 +159,7 @@ export default function Louer() {
                 <p>Tranche de prix incorrect ! </p>
         }
         
-    //console.log(item.position);
+    //console.log(item.composition);
         return (
             //item.typeMaisone.toLowerCase().includes(typeMaisone.toLowerCase()) &&
             //item.tranchePrix.toString().includes(tranchePrix) &&
@@ -167,13 +168,15 @@ export default function Louer() {
             prixMaison >= minPrix &&
             prixMaison <= maxPrix &&
             item.position == position &&
-            item.quartier == indexQuartier
+            item.quartier == indexQuartier &&
+            item.composition==filters.composition
 
         );
 
     });
-    console.log(cuisine);
+   
 
+console.log(filters.composition);
    // console.log(typeMaison);
     console.log(filteredData);
 
